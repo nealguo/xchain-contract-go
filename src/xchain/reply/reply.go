@@ -1,49 +1,40 @@
 package reply
 
 import (
-	"encoding/json"
 	"xchain-contract-go/src/xchain/config"
-	"xchain-contract-go/src/xchain/model"
-	pb "xchain-contract-go/src/xchain/proto/contract"
-	"xchain-contract-go/src/xchain/stub"
+	pb "xchain-contract-go/src/xchain/proto"
+	"xchain-contract-go/src/xchain/vo"
 )
 
-func HandleReply(req *pb.PeerContractRequest, reply *pb.PeerContractReply, stub *stub.ContractStub) *pb.PeerContractReply {
-	// 参数检查
-	if req == nil || reply == nil || stub == nil {
-		return reply
+func ContractResponse(status int, msg, payload string) *vo.Response {
+	return &vo.Response{
+		Code:    status,
+		Message: msg,
+		Payload: payload,
 	}
-	code := reply.GetCode()
-	if code != int32(config.Success) {
-		return reply
-	}
-
-	// 准备读集合和交易哈希
-	stub.PrepareTxReads()
-	stub.PrepareTxHash()
-
-	// 返回结果
-	resp := model.ResponseModel{Value: reply.GetPayload(), Transaction: stub.Tx}
-	bytes, err := json.Marshal(resp)
-	if err != nil {
-		return PeerContractReplyError("Wrong when serializing to json", req.GetPeerIp())
-	}
-	return PeerContractReplySuccess(string(bytes), req.GetPeerIp())
 }
 
-func PeerContractReply(status int, msg, payload, peerIp string) *pb.PeerContractReply {
-	var original = false
-	peerNode := config.GetPeerNode()
-	if peerNode.Host == peerIp {
-		original = true
-	}
-	return &pb.PeerContractReply{Code: int32(status), Message: msg, Payload: payload, Is_Original: original}
+func ContractResponseSuccess(payload string) *vo.Response {
+	return ContractResponse(config.Success, "success", payload)
 }
 
-func PeerContractReplySuccess(payload, peerIp string) *pb.PeerContractReply {
-	return PeerContractReply(config.Success, "success", payload, peerIp)
+func ContractResponseError(msg string) *vo.Response {
+	return ContractResponse(config.Error, msg, "payload")
 }
 
-func PeerContractReplyError(msg, peerIp string) *pb.PeerContractReply {
-	return PeerContractReply(config.Error, msg, "payload", peerIp)
+func RpcReply(status int, msg, payload string) *pb.RpcReply {
+	return &pb.RpcReply{
+		Code:            int32(status),
+		Message:         msg,
+		Payload:         payload,
+		TransactionHash: "",
+		File:            nil}
+}
+
+func RpcReplySuccess(payload string) *pb.RpcReply {
+	return RpcReply(config.Success, "success", payload)
+}
+
+func RpcReplyError(msg string) *pb.RpcReply {
+	return RpcReply(config.Error, msg, "payload")
 }

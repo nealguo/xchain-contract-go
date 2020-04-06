@@ -8,31 +8,46 @@ type Version struct {
 
 // 写集合模型
 type RwSetWrite struct {
-	Key        string `json:"key"`
-	Value      string `json:"value"`
-	Delete     bool   `json:"delete"`
-	Collection string `json:"collection"`
-	AppHash    string `json:"appHash"`
+	Key             string `json:"key"`
+	Value           string `json:"value"`
+	Delete          bool   `json:"delete"`
+	AppId           string `json:"appId"`
+	Collection      string `json:"collection"`
+	ContractVersion string `json:"contractVersion"`
 }
 
 // 读集合模型
 type RwSetRead struct {
-	Key        string  `json:"key"`
-	Version    Version `json:"version"`
-	Collection string  `json:"collection"`
+	Key             string  `json:"key"`
+	Version         Version `json:"version"`
+	Collection      string  `json:"collection"`
+	ContractVersion string  `json:"contractVersion"`
+}
+
+// 合约调用轨迹
+type ContractInvokeTrace struct {
+	Invoke           string                 `json:"invoke"`
+	ContractIdentity string                 `json:"contractIdentity"`
+	ContractVersion  string                 `json:"contractVersion"`
+	SubTraceList     []*ContractInvokeTrace `json:"subTraceList"`
 }
 
 // 交易模型
 type Transaction struct {
-	TxId        int64         `json:"txId"`
-	Invoke      string        `json:"invoke"`
-	Contract    string        `json:"contract"`
-	Writes      []*RwSetWrite `json:"writes"`
-	Reads       []*RwSetRead  `json:"reads"`
-	Version     Version       `json:"version"`
-	ChannelName string        `json:"channelName"`
-	Offset      int64         `json:"offset"`
-	Hash        string        `json:"hash"`
+	TxId                int64                `json:"txId"`
+	Invoke              string               `json:"invoke"`
+	ContractIdentity    string               `json:"contractIdentity"`
+	ContractVersion     string               `json:"contractVersion"`
+	Writes              []*RwSetWrite        `json:"writes"`
+	Reads               []*RwSetRead         `json:"reads"`
+	Version             Version              `json:"version"`
+	ChannelName         string               `json:"channelName"`
+	Offset              int64                `json:"offset"`
+	Hash                string               `json:"hash"`
+	Timestamp           string               `json:"timestamp"`
+	EndorsePeerName     string               `json:"endorsePeerName"`
+	EndorseSign         string               `json:"endorseSign"`
+	ContractInvokeTrace *ContractInvokeTrace `json:"contractInvokeTrace"`
 }
 
 // 合约调用后返回值对应的模型

@@ -2,9 +2,8 @@ package main
 
 import (
 	"log"
-	"xchain-contract-go/src/main/go/contract"
-	"xchain-contract-go/src/xchain/base"
 	"xchain-contract-go/src/xchain/config"
+	"xchain-contract-go/src/xchain/contract"
 )
 
 var server *config.Node
@@ -14,27 +13,26 @@ func init() {
 	log.Printf("Env is preparing...")
 
 	// 初始化环境变量
-	config.Prepare()
+	contract.Prepare()
 
 	// 初始化合约作为服务端
-	contractPort := config.GetContractPort()
+	contractPort := contract.GetContractPort()
 	server = &config.Node{Host: "", Port: contractPort}
 
 	// 初始化Peer的客户端
-	peerNode := config.GetPeerNode()
-	client = &config.Node{Host: peerNode.Host, Port: peerNode.Port}
+	client = contract.GetPeerNode()
 
 	log.Printf("Env is ready, server:%v, client:%v", server, client)
 }
 
 func main() {
 	log.Printf("Contract is initializing...")
-	contract.Init()
+	contract.Load()
 
 	log.Printf("Server and Client is staring...")
-	base.Start(server, client)
+	contract.Start(server, client)
 
-	log.Printf("--- Success, user contract is ready now ---")
+	log.Printf("Contract library is building...")
 
 	select {}
 }

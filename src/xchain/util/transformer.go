@@ -1,27 +1,9 @@
 package util
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
-	"hash"
-	"time"
+	"strconv"
 )
-
-func NewId() int64 {
-	return time.Now().UnixNano()
-}
-
-// SHA256 hashes using sha256 algorithm
-func SHA256(text string) string {
-	algorithm := sha256.New()
-	return stringHasher(algorithm, text)
-}
-
-func stringHasher(algorithm hash.Hash, text string) string {
-	algorithm.Write([]byte(text))
-	return hex.EncodeToString(algorithm.Sum(nil))
-}
 
 func ToString(value interface{}) string {
 	if result, ok := value.(string); ok {
@@ -37,11 +19,18 @@ func ToBool(value interface{}) bool {
 	return false
 }
 
+func ToInt(value interface{}) int {
+	if result, ok := value.(int); ok {
+		return result
+	}
+	return -1
+}
+
 func ToFloat64(value interface{}) float64 {
 	if result, ok := value.(float64); ok {
 		return result
 	}
-	return 0
+	return -1
 }
 
 func ToSlice(value interface{}) []interface{} {
@@ -57,6 +46,21 @@ func ToJson(value interface{}) string {
 		return string(bytes)
 	}
 	return ""
+}
+
+func StrToFloat64(value string) float64 {
+	if value == "" {
+		return -1
+	}
+	float, err := strconv.ParseFloat(value, 64)
+	if err != nil {
+		return -1
+	}
+	return float
+}
+
+func Float64ToStr(value float64) string {
+	return strconv.FormatFloat(value, 'f', -1, 64)
 }
 
 func JsonToSlice(str string) []interface{} {
